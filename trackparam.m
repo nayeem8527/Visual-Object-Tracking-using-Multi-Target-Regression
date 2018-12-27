@@ -180,11 +180,11 @@ switch (trackpars.title)
     otherwise;
         opt = struct('numsample',800,'affsig',[4,4,.08,.000,.0005,.000]);
         dataPath = [seq_path trackpars.title '/'];
-        gt = importdata([dataPath 'groundtruth.txt']);
-        x = gt(:,1:2:end);
-        y = gt(:,2:2:end);
-        gt = [min(x,[],2), min(y,[],2), max(x,[],2) - min(x,[],2), max(y,[],2) - min(y,[],2)];
-        gt = gt(1:10,:);
+        gt = importdata([dataPath 'groundtruth_rect.txt']);
+%         x = gt(:,1:2:end);
+%         y = gt(:,2:2:end);
+%         gt = [min(x,[],2), min(y,[],2), max(x,[],2) - min(x,[],2), max(y,[],2) - min(y,[],2)];
+        gt = gt(1,:);
 %         gt(1,1) = gt(1,1)+(gt(1,3)/2);
 %         gt(1,2) = gt(1,2)+(gt(1,4)/2);
         featpars.bbox = gt;            
@@ -195,10 +195,36 @@ end
 dataPath = [seq_path trackpars.title '/'];
 
 %% get frame number and resolution
-files = dir([dataPath '/' '*.jpg']);
+files = dir([dataPath '/img/*.jpg']);
 frameNum = length(files);
 
 %% create directory to save results
 if ~isdir(['results/' trackpars.title '/'])
     mkdir(['results/' trackpars.title '/']);
 end
+
+
+
+
+
+
+
+% clear
+% clc
+% 
+% img_path = dir('shaking/*.jpg');
+% gt = importdata(['shaking/' 'groundtruth.txt']);
+% x = gt(:,1:2:end);
+% y = gt(:,2:2:end);
+% gt = [min(x,[],2), min(y,[],2), max(x,[],2) - min(x,[],2), max(y,[],2) - min(y,[],2)];
+% 
+% for i=1:size(img_path,1)
+%     disp(i)
+%     I = imread(['shaking/',img_path(i).name]);
+%     figure    
+%     imshow(I)
+%     hold on
+%     rectangle('Position', gt(i,:), 'linewidth', 3, 'EdgeColor', 'r');
+%     imwrite(frame2im(getframe(gcf)),sprintf('../GT/shaking/%s.jpg', i));
+%     close all
+% end

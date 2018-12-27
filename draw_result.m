@@ -1,14 +1,14 @@
 function drawopt = draw_result(drawopt, fno, frame, bbox)
 if (isempty(drawopt))     
   figure('position',[50 100 size(frame,2) size(frame,1)]); clf;                               
-  set(gcf,'DoubleBuffer','on','MenuBar','none');
+  set(gcf,'DoubleBuffer','on','MenuBar','none');%,'Visible','off');
 
   drawopt.curaxis = [];
   drawopt.curaxis.frm  = axes('position', [0.00 0 1.00 1.0]);
 end
 
-curaxis = drawopt.curaxis;
-axes(curaxis.frm);      
+% curaxis = drawopt.curaxis;
+% axes(curaxis.frm);      
 imagesc(frame, [0,255]); 
 colormap(gray);  
 hold on;     
@@ -20,6 +20,6 @@ rectangle('Position', bbox, 'linewidth', 3, 'EdgeColor', 'r');
 text(10, 15, '#', 'Color','y', 'FontWeight','bold', 'FontSize',24);
 text(30, 15, num2str(fno), 'Color','y', 'FontWeight','bold', 'FontSize',24);
 
-axis equal off;
+% axis equal off;
 hold off;
 drawnow;    

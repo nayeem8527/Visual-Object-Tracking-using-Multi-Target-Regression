@@ -1,16 +1,22 @@
-function [GT] = classification(data,dict,gt)
+function [pred,GT] = classification(data,dict,gt)
 
 W = dict.D;
 S = dict.W;
-X = data;
+% X = data;
+X = data';
+n1sq = sum(X.^2,1);
+n1 = size(X,2);
+D = (ones(n1,1)*n1sq)' + ones(n1,1)*n1sq -2*X'*X;
+K = exp(-D/(2*0.01^2));
+X = K*X';
 
 % W = A*X';
 Z = W*X;
 pred = S*Z;
 GT = S*Z;
-% Y = gt;
-% Y = repmat(Y,size(pred));
-% Y = Y(1:2,:);
+Y = gt;
+Y = repmat(Y,size(pred));
+Y = Y(1:2,:);
 % pred = sqrt(sum((pred-Y).^2,1)/2);
 
 % sparse coding
@@ -35,5 +41,5 @@ GT = S*Z;
 % dif2 = H - dict.W * Gamma;
 % cls_error = sqrt(sum(dif2.^2));
 
-% pred = 0.8*pred(1,:) + 0.2*pred(2,:);
+pred = 0.8*pred(1,:) + 0.2*pred(2,:);
 end

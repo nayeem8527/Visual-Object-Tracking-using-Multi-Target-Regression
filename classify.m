@@ -1,4 +1,4 @@
-function [GT] = classify(data,dict,gt)
+function [pred,GT] = classify(data,dict,gt)
 
 % HOG
 % p8 = gcp();
@@ -18,7 +18,7 @@ function [GT] = classify(data,dict,gt)
 % cancel(F9);
 
 % [rec_err,cls_err] = classification(data,dict);
-[GT] = classification(data,dict,gt);
+[pred,GT] = classification(data,dict,gt);
 % [rec_err_ldp,cls_err_ldp] = classification(data_ldp,dict_ldp);
 
 

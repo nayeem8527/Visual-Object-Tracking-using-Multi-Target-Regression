@@ -1,24 +1,26 @@
 function [Dinit, Winit] = init_dict(feat, dictpars)
 
+% X = feat.feaArr;
+X = feat.feaArr';
+n1sq = sum(X.^2,1);
+n1 = size(X,2);
+D = (ones(n1,1)*n1sq)' + ones(n1,1)*n1sq -2*X'*X;
+K = exp(-D/(2*0.01^2));
+X = K*X';
 
-X = feat.feaArr;
-
-temp_y = zeros(size(X,2),10);
-Y = feat.boxes;
-temp_y(:,1:2)= Y(:,1:2);
-temp_y(:,3) = Y(:,1)+Y(:,3);
-temp_y(:,4) = Y(:,2);
-temp_y(:,5) = Y(:,1)+Y(:,3);
-temp_y(:,6) = Y(:,2)+Y(:,4);
-temp_y(:,7) = Y(:,1);
-temp_y(:,8) = Y(:,2)+Y(:,4);
-temp_y(:,9) = (Y(:,1)+Y(:,3))/2;
-temp_y(:,10) = (Y(:,2)+Y(:,4))/2;
-Y = temp_y';
-
-% Y = zeros(2,size(X,2));
-% Y(1,1:500)=1;
-% Y(2,501:size(X,2))=1;
+% temp_y = zeros(size(X,2),8);
+% Y = feat.boxes';
+% % temp_y(:,1:2)= Y(:,1:2);
+% % temp_y(:,3) = Y(:,1)+Y(:,3);
+% % temp_y(:,4) = Y(:,2);
+% % temp_y(:,5) = Y(:,1)+Y(:,3);
+% % temp_y(:,6) = Y(:,2)+Y(:,4);
+% % temp_y(:,7) = Y(:,1);
+% % temp_y(:,8) = Y(:,2)+Y(:,4);
+% % Y = temp_y';
+Y = zeros(2,size(X,2));
+Y(1,1:500)=1;
+Y(2,501:size(X,2))=1;
 eta = 0.000001;
 K = X'*X;
 K_inv = pinv(K);
@@ -28,9 +30,12 @@ lambda = 10^(-5);
 beta = 10^(-4); 
 gamma = 10^(-3); 
 S = rand(size(Y,1),size(Y,1));
+% A = rand(size(Y,1),size(Y,2));
 
-for i=1:6000
-
+for i=1:1
+    
+%     G_A = (-1/N)*(S'*(Y-(S*A)*K)*K) + (lambda/2)*((inv(sqrt((A*K)*A')))*(A*K));
+%     A = A - (eta.*G_A);
     temp1 = S'*S;
     temp2 = (lambda.*(N.*K_inv));
     temp3 = ((S'*Y)*K_inv);
@@ -51,6 +56,7 @@ disp(error);
 W = A*X';
 Dinit = W;
 Winit = S;
+Ainit = A;
 
 % T0=11;  %sparsity level for each patch
 % l2=0.5; %weight for the negative log-determinant penalty in problem formulation

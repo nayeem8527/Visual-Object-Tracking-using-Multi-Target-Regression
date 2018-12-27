@@ -26,20 +26,20 @@ neg_num = trackpars.negnum;
 disp('extracting the global features');
 % feat = extract_global_feature(img, bbox, pos_num, neg_num);
 % feat = extract_global_feature(img, bbox, 1000, 5000,0.1,5,1,10,1);
-feat = extract_global_feature(img, bbox, 500, 500,0.1,5,1,10,1);
+feat = extract_global_feature(img, bbox, 500, 500,0.1,5,1,10,1,featpars.bbox);
 
 %% dictionary initialization
-% numcls = length(unique(feat.label));
-% dictpars.numBases = dictpars.numpercls * numcls; % dictionary size
-dictpars.numcls = 1;
+numcls = length(unique(feat.label));
+dictpars.numBases = dictpars.numpercls * numcls; % dictionary size
+dictpars.numcls = numcls;
 disp('initializing the dictionary');
 [D, W] = init_dict(feat, dictpars);
 dict.D = D;
 dict.W = W;
 % dict.A = A;
 % dict.Q = Q;
-bbox = bbox(10,:);
-% T = []; TW = [];
-% [T, TW] = get_template(img, bbox, T, TW, 0, trackpars);
-% dict.T = T;
-% dict.TW = TW;
+
+T = []; TW = [];
+[T, TW] = get_template(img, bbox, T, TW, 0, trackpars,featpars.bbox);
+dict.T = T;
+dict.TW = TW;

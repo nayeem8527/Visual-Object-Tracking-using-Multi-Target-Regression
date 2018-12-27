@@ -1,31 +1,23 @@
 function dict = update_dict(feat, dictpars, dict)
 
-X = feat.feaArr;
+% X = feat.feaArr;
+X = feat.feaArr';
+n1sq = sum(X.^2,1);
+n1 = size(X,2);
+D = (ones(n1,1)*n1sq)' + ones(n1,1)*n1sq -2*X'*X;
+K = exp(-D/(2*0.01^2));
+X = K*X';
 
-% A = dict.D;
+% A = dict.A;
 S = dict.W;
 % Y = feat.boxes;
-
-temp_y = zeros(size(X,2),10);
-Y = feat.boxes;
-temp_y(:,1:2)= Y(:,1:2);
-temp_y(:,3) = Y(:,1)+Y(:,3);
-temp_y(:,4) = Y(:,2);
-temp_y(:,5) = Y(:,1)+Y(:,3);
-temp_y(:,6) = Y(:,2)+Y(:,4);
-temp_y(:,7) = Y(:,1);
-temp_y(:,8) = Y(:,2)+Y(:,4);
-temp_y(:,9) = (Y(:,1)+Y(:,3))/2;
-temp_y(:,10) = (Y(:,2)+Y(:,4))/2;
-Y = temp_y';
-
-% Y = feat.label;
-% newY = zeros(2,size(Y,2));
-% ind1 = find(Y==1);
-% ind2 = find(Y==-1);
-% newY(1,ind1)=1;
-% newY(2,ind2)=1;
-% Y=newY;
+Y = feat.label;
+newY = zeros(2,size(Y,2));
+ind1 = find(Y==1);
+ind2 = find(Y==-1);
+newY(1,ind1)=1;
+newY(2,ind2)=1;
+Y=newY;
 eta = 0.000001;
 K = X'*X;
 K_inv = pinv(K);
@@ -35,8 +27,10 @@ lambda = 10^(-5);
 beta = 10^(-4); 
 gamma = 10^(-3); 
 
-for i=1:6000
+for i=1:1
 
+%     G_A = (-1/N)*(S'*(Y-(S*A)*K)*K) + (lambda/2)*((inv(sqrt((A*K)*A')))*(A*K));
+%     A = A - (eta.*G_A);
     temp1 = S'*S;
     temp2 = (lambda.*(N.*K_inv));
     temp3 = ((S'*Y)*K_inv);
@@ -51,14 +45,15 @@ for i=1:6000
 
     % for checking the convergence
 %     error = (1/N)*trace((Y-((S*A)*K))'*(Y-((S*A)*K))) + lambda*trace((A*K)*A') + beta*(trace(sqrt(S'*S))) + gamma*(trace(S'*S));
+%     disp('updation');
 %     disp(error);    
 end
 % error = (1/N)*trace((Y-((S*A)*K))'*(Y-((S*A)*K))) + lambda*trace((A*K)*A') + beta*(trace(sqrt(S'*S))) + gamma*(trace(S'*S));
 % disp(error);    
 W = A*X';
-dict.D = W;
-dict.W = S;
-
+dict.D = 0.8*dict.D + W*0.2;
+dict.W = 0.2*dict.W + S*0.8;
+% dict.A = 0.2*dict.A + A*0.8;
 
 % online dictionary learning using stochastic gradient descent algorithm
 % Inputs:

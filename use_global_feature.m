@@ -1,4 +1,4 @@
-function [bb_next, samples,gt] = use_global_feature(img, dict, bb_prev, trackpars, sparsity, opt,p1,p2,gt)
+function [bb_next, samples, pred,ind,gt] = use_global_feature(img, dict, bb_prev, trackpars, sparsity, opt,p1,p2,gt,ppp)
 %
 gfrm = double(img);
 
@@ -10,11 +10,9 @@ bbox = bb_prev;
 
 %% generate candidates
 % pos_examples = gen_samples('gaussian', bbox, 500, 0.3, 2,gfrm);
-
-% pos_examples = gen_samples('gaussian', bbox, 1000, p1, p2,gfrm);
-
+pos_examples = gen_samples('gaussian', bbox, 1000, p1, p2,gfrm);
 % r = overlap_ratio(pos_examples,bbox);
-% pos_examples = pos_examples(r>0.6,:);
+% pos_examples = pos_examples(r>0.7,:);
 % pos_examples = pos_examples(pos_examples(:,1)>=1,:);
 % pos_examples = pos_examples((pos_examples(:,1)+pos_examples(:,3))<=size(img,2),:);
 % pos_examples = pos_examples(pos_examples(:,2)>=1,:);
@@ -32,7 +30,7 @@ bbox = bb_prev;
 % 
 % neg_examples = neg_examples(randsample(end,min(500,end)),:);
 
-examples = [bbox];%; neg_examples];
+examples = [pos_examples];%; neg_examples];
 % locs = sampling(p0, opt.numsample, opt.affsig); 
 
 % candidates = warpimg(gfrm, affparam2mat(locs), psize);
@@ -79,7 +77,7 @@ disp('use global feature');
 % toc
 
 % breakings = 1:ceil(length(locs)/4):length(locs);
-data = feat_extractor_hog(gfrm,examples);
+data = feat_extractor_hog(gfrm,examples,ppp);
 % p6 = gcp();
 % F6 = parfeval(p6,@feat_extractor_hog,1,length(locs), candidates);
 % p71 = gcp();
@@ -123,32 +121,29 @@ data = data ./ (ones(size(data,1),1) * A_norm + eps);
 
 disp('Classify');
 % tic
-[GT] = classify(double(data),dict, gt);
+[pred,GT] = classify(double(data),dict, gt);
 % toc
 % [~, ind] = min(pred.val);
-% [val, ind] = max(pred);
-% disp(val);
-% gt = GT(:,ind);
+[val, ind] = max(pred);
+disp(val);
+gt = GT(:,ind);
 % ind = pred.best_ind;
 % best = locs(:, ind);
-% best = examples(ind,:);
+best = examples(ind,:);
 % bbox = [best(1), best(2), best(3)*psize(2), best(5)*best(3)*psize(1)];
 
 % bb_next = [bbox(2)-bbox(4)/2, bbox(1)-bbox(3)/2, bbox(2)+bbox(4)/2, bbox(1)+bbox(3)/2];
-bb_next = [GT(1,1) GT(2,1) GT(3,1)-GT(1,1) GT(6,1)-GT(2,1)];
-gt = bb_next;
-% bb_next=best;
+bb_next=best;
 
-% isgood = update_check(pred, ind, dict);
-% 
-% samples = [];
-samples = data;
-% if isgood
-%     disp('again extract global features');
-% %     tic
-% %     samples = extract_global_feature(img, bb_next, trackpars.updatenum, trackpars.updatenum);
-%     samples = extract_global_feature(img, bb_next, 100,100,0.1,3,2,3,2);
-% %     samples_ldp = extract_global_feature_ldp(img, bb_next, trackpars.updatenum, trackpars.updatenum);
-% %     toc
-% end
+isgood = update_check(pred, ind, dict);
+
+samples = [];
+if isgood
+    disp('again extract global features');
+%     tic
+%     samples = extract_global_feature(img, bb_next, trackpars.updatenum, trackpars.updatenum);
+    samples = extract_global_feature(img, bb_next, 100,100,0.1,3,2,3,2,ppp);
+%     samples_ldp = extract_global_feature_ldp(img, bb_next, trackpars.updatenum, trackpars.updatenum);
+%     toc
+end
 

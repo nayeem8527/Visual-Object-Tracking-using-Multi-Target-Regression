@@ -1,4 +1,4 @@
-function [T, TW] = get_template(frame, bb, T, TW, err, trackpars)
+function [T, TW] = get_template(frame, bb, T, TW, err, trackpars,ppp)
 %
 img = frame;
 [h, w] = size(img);
@@ -9,7 +9,7 @@ img = frame;
 % tmp = fhog(single(tmp));
 % tt = tmp(:);
 % tt = tt(1:496,:);
-tt = feat_extractor_hog(img,bb);
+tt = feat_extractor_hog(img,bb,ppp);
 
 
 % T = [T  tmp(:) / sqrt(sum(tmp(:) .* tmp(:)))];
